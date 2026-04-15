@@ -47,7 +47,14 @@
 - Descrição: O endpoint `POST/v1/veiculos` estava retornando `200 Ok` por causa do `@HttpCode(200)`, mesmo sendo uma operação de criação. isso deixava a resposta fora do padrão HTTP.
 - Solução: Remoção do `@HttpCode(200)` para o Nest voltar a responder com `201 Created` automaticamente no cadastro de veículo
   
-### Bug 7
+### Bug 7 API - Filtros de debito
+
+- localização: `backend-nest/src/debito/infra/repository/Debito.repository.ts` > (lines: 12-27)
+- Reprodução: consultar `GET /v1/debitos/veiculo/ABC1234?status=PAGO` e `GET /v1/debitos/veiculo/ABC1234?tipo=LICENCIAMENTO`.
+- Descrição: Os filtros por `status` e `tipo` não estavam sendo aplicados na consulta dos débitos. O filtro por `tipo` estava comentado e o filtro por `status` nem existia, assim a API sempre retornava a lista completa.
+- Solução: Implementai os `andWhere` para `status` e `tipo` na query do repositório, fazendo com que os parâmetros enviados na rota passem a afetar corretamente o resultado.
+
+### Bug 8
 
 ## Funcionalidades implementadas
 
