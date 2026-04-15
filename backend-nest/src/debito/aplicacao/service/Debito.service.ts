@@ -30,7 +30,7 @@ export class DebitoService {
   }
 
   async listarPorPlaca(placa: string, command: FiltrarDebitosCommand): Promise<DebitoCalculadoQuery[]> {
-    const veiculo = this.veiculoRepository.buscarPorPlaca(placa.toUpperCase());
+    const veiculo = await this.veiculoRepository.buscarPorPlaca(placa.toUpperCase());
 
     if (!veiculo) {
       throw new NotFoundException(`Veículo com placa ${placa} não encontrado`);
@@ -38,7 +38,7 @@ export class DebitoService {
 
     const debitos = await this.debitoRepository.listar({
       ...command,
-      veiculoId: (veiculo as any).id,
+      veiculoId: veiculo.id,
     });
 
     return debitos.map((d) => this.calcularTotais(d));
