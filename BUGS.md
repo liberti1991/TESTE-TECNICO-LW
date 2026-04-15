@@ -190,3 +190,15 @@
   - a criação de veículo normaliza a placa automaticamente no DTO
   - controllers e services passaram a reutilizar a mesma regra de validação e normalização
   - teste de placa invalida pega com sucesso pelo dto
+
+### Melhoria API - Exception filter global no Nest
+
+- localização: `backend-nest/src/common/filters/HttpException.filter.ts`, `backend-nest/src/main.ts`
+- Descrição: o backend utilizava o tratamento padrão do Nest para erros, o que deixava as respostas variarem conforme o tipo de exceção lançada e dificultava manter um formato previsível para consumo pelo frontend.
+- Solução: criei um exception filter global para padronizar as respostas de erro da API, retornando `statusCode`, `timestamp`, `path` e `message`. Depois registrei esse filtro no `main.ts`, fazendo com que toda a aplicação passe a responder erros com a mesma estrutura.
+- Validação:
+  - exceções HTTP passaram a retornar o mesmo formato de resposta
+  - erros inesperados passaram a retornar `500` com estrutura padronizada
+  - validei `400`, `404` e `409` com respostas padronizadas
+  - o backend compilou normalmente após a inclusão do filtro
+  
