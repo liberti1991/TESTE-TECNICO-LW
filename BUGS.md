@@ -129,10 +129,15 @@
 
 ### Funcionalidade 2.6 FRONT - Botão quitar débito
 
-- localização:
-- Reprodução:
-- Descrição:
-- Solução:
+- localização: `frontend/src/app/veiculo/[placa]/page.tsx` > (lines: 39-101, 106-135, 154-158), `frontend/src/components/DebitosList.tsx` > (lines: 66-82)
+- Reprodução: acessar a tela de detalhes de um veículo com débitos pendentes, como `/veiculo/DEF5678`, e clicar no botão `Quitar` em um débito com status diferente de `PAGO`.
+- Descrição: A tela de detalhes nao existia a funcionalidade de quitar.
+- Solução: Criei um botão com a ação de quitar na página de detalhes, chamando o endpoint de quitação, buscando novamente os débitos do veículo e atualizando o estado local da tela. Também adicionei feedback visual de sucesso e erro em formato de toast, além de loading apenas no botão selecionado durante a requisição. Para facilitar a visualização do carregamento na interface, deixei um pequeno atraso controlado na chamada antes do envio da requisição.
 - Validação:
+  - ao clicar em `Quitar`, apenas o botão do débito selecionado mostra loading
+  - após sucesso, o status do débito passa para `PAGO`
+  - o total em aberto é recalculado sem recarregar a página
+  - em caso de erro, a tela exibe a mensagem retornada pela API
+  - o feedback de sucesso ou erro aparece em formato de toast na tela
 
 ## Melhorias
