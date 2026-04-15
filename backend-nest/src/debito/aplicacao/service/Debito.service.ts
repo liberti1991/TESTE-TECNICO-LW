@@ -15,17 +15,22 @@ export class DebitoService {
     private readonly veiculoRepository: VeiculoRepository,
   ) {}
 
-  calcularTotais(debito: Debito): DebitoCalculadoQuery {
-    const valorMulta = debito.valor * (debito.percentualMulta / 100);
+  private arredondarMoeda(valor: number): number {
+    return Number(valor.toFixed(2));
+  }
 
-    const valorComMulta = debito.valor + valorMulta;
-    const valorJuros = valorComMulta * (debito.percentualJuros / 100);
+  calcularTotais(debito: Debito): DebitoCalculadoQuery {
+    const valorBase = this.arredondarMoeda(debito.valor);
+    const valorMulta = this.arredondarMoeda(valorBase * (debito.percentualMulta / 100));
+    const valorJuros = this.arredondarMoeda(valorBase * (debito.percentualJuros / 100));
+    const valorTotal = this.arredondarMoeda(valorBase + valorMulta + valorJuros);
 
     return {
       ...debito,
+      valor: valorBase,
       valorMulta,
       valorJuros,
-      valorTotal: valorComMulta + valorJuros,
+      valorTotal,
     };
   }
 

@@ -33,7 +33,14 @@
 - Descrição: O Frontend estava esperando os dados dos débitos no formato `snake_case`, campos como `valor_total`, `Valor_multa` e `valor_juros`. Porém o backend retornava esses dados em `camelCase` como `valorTotal`, `ValorMulta` e `ValorJuros`. isso fazia os valores chegarem como undefined no component causando o erro `Cannot read properties of undefined (reading 'toLocaleString')` ao abrir os detalhes do veículo.
 - Solução: Ajustando os tipos e o consumo dos dados no frontend para seguir o mesmo padrão do backend, trocando os campos em `snake_case` para `camelCase`. assim passa a ser lidos corretamente e a tela voltou a funcionar sem crachá.
 
-### Bug 5
+### Bug 5 API - Cálculo incorreto dos débitos
+
+- localização: `backend-nest/src/debito/aplicacao/service/Debito.service.ts` > (lines: 18-33)
+- Reprodução: consultar `GET /v1/debitos/3` e comparar os valores retornados com o cálculo esperado de multa, juros e total.
+- Descrição: O cálculo do débito estava incorreto porque os juros eram aplicados sobre o valor com multa, em vez de serem calculados separadamente sobre o valor original. isso fazia o `valorTotal` ficar maior do que o esperado. também havia problema de precisão, retornando números com muitas casas decimais.
+- Solução: Ajustei a regra para calcular `valorMulta` e `valorJuros` sobre o valor base do débito e definir o `valorTotal` como a soma de `valor + valorMulta + valorJuros`. Também apliquei arredondamento monetário para duas casas decimais.
+
+### Bug 6
 
 ## Funcionalidades implementadas
 
