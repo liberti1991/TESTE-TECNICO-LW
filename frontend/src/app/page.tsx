@@ -1,7 +1,9 @@
 'use client';
 
 import Header from '@/components/Header';
+import Paginacao from '@/components/Paginacao';
 import VeiculoCard from '@/components/VeiculoCard';
+import { usePaginacao } from '@/hooks/usePaginacao';
 import api, { API_PREFIX, RespostaPaginada, Veiculo } from '@/lib/api';
 import { estaAutenticado } from '@/lib/auth';
 import { useRouter } from 'next/navigation';
@@ -13,28 +15,32 @@ export default function HomePage() {
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState('');
   const [busca, setBusca] = useState('');
-
-  // FEATURE FALTANDO: Os estados de paginação abaixo existem mas não há componente
-  // de paginação implementado. A API retorna { data, total, page, limit }
-  // mas o frontend ignora `total` e não oferece navegação entre páginas.
-  const [paginaAtual] = useState(1);
-  const [totalRegistros, setTotalRegistros] = useState(0);
-  const LIMITE = 4;
+  const {
+    paginaAtual,
+    limite,
+    totalRegistros,
+    totalPaginas,
+    setTotalRegistros,
+    mudarPagina,
+  } = usePaginacao();
 
   useEffect(() => {
     if (!estaAutenticado()) {
       router.push('/login');
       return;
     }
+
     carregarVeiculos();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [paginaAtual]);
 
   async function carregarVeiculos() {
     setCarregando(true);
+    setErro('');
+
     try {
       const { data } = await api.get<RespostaPaginada<Veiculo>>(
-        `${API_PREFIX}/veiculos?page=${paginaAtual}&limit=${LIMITE}`
+        `${API_PREFIX}/veiculos?page=${paginaAtual}&limit=${limite}`,
       );
       setVeiculos(data.data);
       setTotalRegistros(data.total);
@@ -49,20 +55,18 @@ export default function HomePage() {
     (v) =>
       v.placa.toLowerCase().includes(busca.toLowerCase()) ||
       v.proprietario.toLowerCase().includes(busca.toLowerCase()) ||
-      v.modelo.toLowerCase().includes(busca.toLowerCase())
+      v.modelo.toLowerCase().includes(busca.toLowerCase()),
   );
-
-  const totalPaginas = Math.ceil(totalRegistros / LIMITE);
 
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
 
-      <main className="max-w-5xl mx-auto px-4 py-8">
-        <div className="flex items-center justify-between mb-6">
+      <main className="mx-auto max-w-5xl px-4 py-8">
+        <div className="mb-6 flex items-center justify-between">
           <div>
             <h2 className="text-2xl font-bold text-gray-800">Veículos</h2>
-            <p className="text-sm text-gray-500 mt-0.5">{totalRegistros} veículos cadastrados</p>
+            <p className="mt-0.5 text-sm text-gray-500">{totalRegistros} veículos cadastrados</p>
           </div>
         </div>
 
@@ -72,40 +76,42 @@ export default function HomePage() {
             value={busca}
             onChange={(e) => setBusca(e.target.value)}
             placeholder="Buscar por placa, proprietário ou modelo..."
-            className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
 
         {erro && (
-          <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg px-4 py-3 mb-4 text-sm">
+          <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
             {erro}
           </div>
         )}
 
         {carregando ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {Array.from({ length: LIMITE }).map((_, i) => (
-              <div key={i} className="bg-white rounded-lg border border-gray-200 p-4 animate-pulse h-28" />
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            {Array.from({ length: limite }).map((_, i) => (
+              <div key={i} className="h-28 animate-pulse rounded-lg border border-gray-200 bg-white p-4" />
             ))}
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               {veiculosFiltrados.map((v) => (
                 <VeiculoCard key={v.id} veiculo={v} />
               ))}
             </div>
 
             {veiculosFiltrados.length === 0 && !carregando && (
-              <p className="text-center text-gray-500 py-10">Nenhum veículo encontrado.</p>
+              <p className="py-10 text-center text-gray-500">Nenhum veículo encontrado.</p>
             )}
 
-            {/* FEATURE FALTANDO: Implementar componente de paginação aqui.
-                Use as variáveis `paginaAtual`, `totalPaginas` e `setPaginaAtual`
-                para renderizar os controles de navegação. */}
-            <div className="mt-6 flex justify-center">
-              <p className="text-xs text-gray-400">
-                Página {paginaAtual} de {totalPaginas} — paginação não implementada
+            <div className="mt-6 space-y-2">
+              <Paginacao
+                paginaAtual={paginaAtual}
+                totalPaginas={totalPaginas}
+                onMudar={mudarPagina}
+              />
+              <p className="text-center text-xs text-gray-400">
+                Página {paginaAtual} de {totalPaginas}
               </p>
             </div>
           </>

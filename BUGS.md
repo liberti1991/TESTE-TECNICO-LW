@@ -125,15 +125,17 @@
   - o endpoint retorna apenas veículos com débitos `VENCIDO`
   - cada item retorna `placa`, `proprietario`, `modelo`, `totalDebitosVencidos` e `valorTotalVencido`
   - a lista vem ordenada por `valorTotalVencido` decrescente
-  - o retorno inclui `totalVeiculos` e `valorTotalGeral`
 
 ### Funcionalidade 2.5 FRONT - Paginação na listagem de veículos
 
-- localização:
-- Reprodução:
-- Descrição:
-- Solução:
+- localização: `frontend/src/app/page.tsx` > (lines: 18-25, 37-46, 107-115), `frontend/src/components/Paginacao.tsx` > (lines: 1-57)
+- Reprodução: acessar a home `/`, navegar entre as páginas da listagem e observar a atualização dos veículos exibidos.
+- Descrição: a API já retornava os dados paginados com `data`, `total`, `page` e `limit`, porém o frontend não possuía componente de paginação nem permitia mudar a página atual da listagem.
+- Solução: implementei o componente `Paginacao.tsx` com botões `Anterior`, `Próxima` e números das páginas, além de integrar a navegação com o estado `paginaAtual` em `page.tsx`, refazendo a busca na API a cada mudança e deixei como default 4 itens para ficar harmônico a visualização.
 - Validação:
+  - ao clicar em `Próxima` ou em um número de página, a listagem é atualizada
+  - `Anterior` fica desabilitado na primeira página
+  - `Próxima` fica desabilitado na última página
 
 ### Funcionalidade 2.6 FRONT - Botão quitar débito
 
@@ -150,7 +152,7 @@
 
 ## Melhorias
 
-### Melhoria - Util compartilhado para arredondamento monetário
+### Melhoria API - Util compartilhado para arredondamento monetário
 
 - localização: `backend-nest/src/common/utils/moeda.util.ts`, `backend-nest/src/debito/aplicacao/service/Debito.service.ts`, `backend-nest/src/relatorio/aplicacao/service/Relatorio.service.ts`
 - Descrição: Regra de arredondamento duplicada em mais de um service, risco de inconsistência futura caso a forma de cálculo precisasse ser alterada.
@@ -158,3 +160,12 @@
 - Validação:
   - os cálculos continuaram retornando valores com duas casas decimais
   - os services passaram a consumir a mesma função utilitária
+
+### Melhoria FRONT - Hook reutilizável de paginação
+
+- localização: `frontend/src/hooks/usePaginacao.ts`, `frontend/src/app/page.tsx`
+- Descrição: a lógica de paginação estava concentrada diretamente na página, o que dificultaria a reutilização desse comportamento em outras listagens da aplicação.
+- Solução: criei o hook `usePaginacao`, centralizando `paginaAtual`, `limite`, `totalRegistros`, `totalPaginas` e as ações de navegação. O hook aceita `limiteInicial` opcional e, quando não informado, utiliza `4` como padrão.
+- Validação:
+  - a home passou a consumir o hook sem alterar o comportamento esperado
+  
