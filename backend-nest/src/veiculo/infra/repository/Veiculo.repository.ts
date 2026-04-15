@@ -13,12 +13,33 @@ export class VeiculoRepository implements IVeiculoRepository {
   async listar(command: FiltrarVeiculosCommand): Promise<ListarVeiculosQuery> {
     const { page = 1, limit = 10, proprietario, modelo, anoMin, anoMax } = command;
     const offset = (page - 1) * limit;
+    const query = this.repository.createQueryBuilder('veiculo');
+    const proprietarioFiltro = proprietario?.trim().toLowerCase();
+    const modeloFiltro = modelo?.trim().toLowerCase();
 
-    const query = this.repository.createQueryBuilder('v');
+    if (proprietarioFiltro) {
+      query.andWhere('LOWER(veiculo.proprietario) LIKE :proprietario', {
+        proprietario: `%${proprietarioFiltro}%`,
+      });
+    }
+
+    if (modeloFiltro) {
+      query.andWhere('LOWER(veiculo.modelo) LIKE :modelo', {
+        modelo: `%${modeloFiltro}%`,
+      });
+    }
+
+    if (anoMin !== undefined) {
+      query.andWhere('veiculo.ano >= :anoMin', { anoMin });
+    }
+
+    if (anoMax !== undefined) {
+      query.andWhere('veiculo.ano <= :anoMax', { anoMax });
+    }
 
     const [data, total] = await Promise.all([
-      query.skip(offset).take(limit).getMany(),
-      query.getCount(),
+      query.clone().skip(offset).take(limit).getMany(),
+      query.clone().getCount(),
     ]);
 
     return { data, total, page, limit };
