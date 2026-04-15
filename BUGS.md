@@ -61,7 +61,14 @@
 - Descrição: O interceptor global travava qualquer `410 Unauthorized` redirecionando o usuário para `/login`, inclusive quado o erro vinha da própria rota de login. isso atrapalha o fluxo de autenticação e poderia esconder o feedback correto de credenciais inválidas.
 - Solução: Ajustando o interceptor para manter o redirecionamento apenas para rotas protegidas e ignorar esse comportamento quando o 401 vier da rota de login. Assim o formulário consegue exibir o erro corretamente ao usuário.
   
-### Bug 9
+### Bug 9 FRONT - Bug na conversão de datas
+
+- localização: `frontend/src/components/DebitosList.tsx` > (lines: 26-29)
+- Reprodução: acessar `http://localhost:3000/veiculo/ABC1234` e comparar a data mostrada na tela com a data recebida da API, por exemplo `2024-06-30`.
+- Descrição: Ao abrir a tela de detalhes do veículo, algumas datas de vencimento apareciam com um dia a menos. isso acontecia porque a data recebida da API era convertida diretamente com `new Date`, sofrendo impacto do fuso do navegador.
+- Solução: Ajustando a função de formato para montar a data manualmente a partir da string recebida, garantindo que o vencimento exibido seja o mesmo informado pela API.
+  
+### Bug 10
 
 ## Funcionalidades implementadas
 

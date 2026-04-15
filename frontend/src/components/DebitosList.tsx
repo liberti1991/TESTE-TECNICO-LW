@@ -24,7 +24,8 @@ function formatarMoeda(valor: number): string {
 }
 
 function formatarData(dataStr: string): string {
-  const data = new Date(dataStr);
+  const [ano, mes, dia] = dataStr.split('-').map(Number);
+  const data = new Date(ano, mes - 1, dia);
   return data.toLocaleDateString('pt-BR');
 }
 
