@@ -180,3 +180,13 @@
   - a página de detalhes passou a apenas consumir o componente
   - o frontend compilou normalmente após a extração
   
+  ### Melhoria API - Validação centralizada de placa
+
+- localização: `backend-nest/src/common/utils/placa.util.ts`, `backend-nest/src/common/pipes/placa.pipe.ts`, `backend-nest/src/veiculo/dominio/dto/CriarVeiculo.dto.ts`, `backend-nest/src/veiculo/aplicacao/controller/Veiculo.controller.ts`, `backend-nest/src/debito/aplicacao/controller/Debito.controller.ts`
+- Descrição: a regra de validação e normalização de placa estava distribuída em mais de um ponto do backend, o que aumentava o risco de inconsistência entre valores recebidos por body, params e query string.
+- Solução: centralizei um regex, a mensagem de erro e a normalização da placa em `placa.util.ts`, criei o `PlacaPipe` para validar parâmetros e querys e ajustei o `CriarVeiculoDto` para reutilizar a mesma regra no body. Também mantive a normalização reaproveitada nas consultas do backend.
+- Validação:
+  - placas inválidas passaram a retornar erro consistente nas rotas por parâmetro e query
+  - a criação de veículo normaliza a placa automaticamente no DTO
+  - controllers e services passaram a reutilizar a mesma regra de validação e normalização
+  - teste de placa invalida pega com sucesso pelo dto

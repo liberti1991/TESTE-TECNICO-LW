@@ -9,6 +9,7 @@ import { DebitoRepository } from 'src/debito/infra/repository/Debito.repository'
 import { arredondarMoeda } from 'src/common/utils/moeda.util';
 import { calcularDebito } from 'src/common/utils/calcularDebito.util';
 import { VeiculoRepository } from 'src/veiculo/infra/repository/Veiculo.repository';
+import { normalizarPlaca } from 'src/common/utils/placa.util';
 
 @Injectable()
 export class DebitoService {
@@ -34,7 +35,7 @@ export class DebitoService {
   }
 
   async listarPorPlaca(placa: string, command: FiltrarDebitosCommand): Promise<DebitoCalculadoQuery[]> {
-    const veiculo = await this.veiculoRepository.buscarPorPlaca(placa.toUpperCase());
+    const veiculo = await this.veiculoRepository.buscarPorPlaca(normalizarPlaca(placa));
 
     if (!veiculo) {
       throw new NotFoundException(`Veículo com placa ${placa} não encontrado`);
@@ -98,7 +99,7 @@ export class DebitoService {
   }
 
   async resumo(placa: string): Promise<ResumoDebitosQuery> {
-    const veiculo = await this.veiculoRepository.buscarPorPlaca(placa.toUpperCase());
+    const veiculo = await this.veiculoRepository.buscarPorPlaca(normalizarPlaca(placa));
 
     if (!veiculo) {
       throw new NotFoundException(`Veículo com placa ${placa} não encontrado`);

@@ -16,6 +16,7 @@ import { FiltrarDebitosCommand } from 'src/debito/dominio/command/FiltrarDebitos
 import { DebitoCalculadoQuery } from 'src/debito/dominio/query/DebitoCalculado.query';
 import { ResumoDebitosQuery } from 'src/debito/dominio/query/ResumoDebitos.query';
 import { JwtAuthGuard } from 'src/auth/guards/JwtAuth.guard';
+import { PlacaPipe } from 'src/common/pipes/placa.pipe';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -32,7 +33,7 @@ export class DebitoController {
   @ApiNotFoundResponse({ description: 'Veículo não encontrado' })
   @Get('veiculo/:placa')
   async listarPorPlaca(
-    @Param('placa') placa: string,
+    @Param('placa', PlacaPipe) placa: string,
     @Query() command: FiltrarDebitosCommand,
   ): Promise<DebitoCalculadoQuery[]> {
     return this.debitoService.listarPorPlaca(placa, command);
@@ -42,7 +43,7 @@ export class DebitoController {
   @ApiOkResponse({ type: ResumoDebitosQuery })
   @ApiQuery({ name: 'placa', required: true })
   @Get('resumo')
-  async resumo(@Query('placa') placa: string): Promise<ResumoDebitosQuery> {
+  async resumo(@Query('placa', PlacaPipe) placa: string): Promise<ResumoDebitosQuery> {
     return this.debitoService.resumo(placa);
   }
 

@@ -1,12 +1,15 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 import { IsInt, IsNotEmpty, IsString, Matches, Max, Min } from 'class-validator';
+import { normalizarPlaca, PLACA_INVALIDA_MESSAGE, PLACA_REGEX } from 'src/common/utils/placa.util';
 
 export class CriarVeiculoDto {
   @ApiProperty({ example: 'ABC1D23', description: 'Placa no formato antigo (ABC1234) ou Mercosul (ABC1D23)' })
   @IsString()
   @IsNotEmpty()
-  @Matches(/^[A-Za-z]{3}[\d][A-Za-z0-9][\d]{2}$/, {
-    message: 'Placa inválida. Formatos aceitos: ABC1234 ou ABC1D23',
+  @Transform(({ value }) => (typeof value === 'string' ? normalizarPlaca(value) : value))
+  @Matches(PLACA_REGEX, {
+    message: PLACA_INVALIDA_MESSAGE,
   })
   placa: string;
 

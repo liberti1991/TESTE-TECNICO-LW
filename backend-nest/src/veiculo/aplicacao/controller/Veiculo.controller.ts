@@ -14,6 +14,7 @@ import { CriarVeiculoDto } from 'src/veiculo/dominio/dto/CriarVeiculo.dto';
 import { FiltrarVeiculosCommand } from 'src/veiculo/dominio/command/FiltrarVeiculos.command';
 import { ListarVeiculosQuery } from 'src/veiculo/dominio/query/ListarVeiculos.query';
 import { JwtAuthGuard } from 'src/auth/guards/JwtAuth.guard';
+import { PlacaPipe } from 'src/common/pipes/placa.pipe';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -33,7 +34,7 @@ export class VeiculoController {
   @ApiOkResponse({ type: Veiculo })
   @ApiNotFoundResponse({ description: 'Veículo não encontrado' })
   @Get(':placa')
-  async buscarPorPlaca(@Param('placa') placa: string): Promise<Veiculo> {
+  async buscarPorPlaca(@Param('placa', PlacaPipe) placa: string): Promise<Veiculo> {
     return this.veiculoService.buscarPorPlaca(placa);
   }
 

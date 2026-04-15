@@ -5,6 +5,7 @@ import { Veiculo } from 'src/veiculo/dominio/entity/Veiculo.entity';
 import { FiltrarVeiculosCommand } from 'src/veiculo/dominio/command/FiltrarVeiculos.command';
 import { ListarVeiculosQuery } from 'src/veiculo/dominio/query/ListarVeiculos.query';
 import { IVeiculoRepository } from 'src/veiculo/dominio/interfaces/IVeiculoRepository.interface';
+import { normalizarPlaca } from 'src/common/utils/placa.util';
 
 @Injectable()
 export class VeiculoRepository implements IVeiculoRepository {
@@ -46,7 +47,7 @@ export class VeiculoRepository implements IVeiculoRepository {
   }
 
   async buscarPorPlaca(placa: string): Promise<Veiculo | null> {
-    return this.repository.findOne({ where: { placa: placa.toUpperCase() } });
+    return this.repository.findOne({ where: { placa: normalizarPlaca(placa) } });
   }
 
   async buscarPorId(id: number): Promise<Veiculo | null> {
@@ -56,7 +57,7 @@ export class VeiculoRepository implements IVeiculoRepository {
   async inserir(dados: Partial<Veiculo>): Promise<Veiculo> {
     const veiculo = this.repository.create({
       ...dados,
-      placa: dados.placa?.toUpperCase(),
+      placa: dados.placa ? normalizarPlaca(dados.placa) : dados.placa,
     });
     return this.repository.save(veiculo);
   }
