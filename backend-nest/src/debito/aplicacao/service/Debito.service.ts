@@ -1,4 +1,4 @@
-import { Injectable, NotImplementedException, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, NotImplementedException, NotFoundException } from '@nestjs/common';
 import { DebitoRepository } from 'src/debito/infra/repository/Debito.repository';
 import { VeiculoRepository } from 'src/veiculo/infra/repository/Veiculo.repository';
 import { Debito } from 'src/debito/dominio/entity/Debito.entity';
@@ -85,7 +85,17 @@ export class DebitoService {
   }
 
   async quitar(id: number): Promise<void> {
-    throw new NotImplementedException('Funcionalidade não implementada');
+    const debito = await this.debitoRepository.buscarPorId(id);
+
+    if (!debito) {
+      throw new NotFoundException(`Débito ${id} não encontrado`);
+    }
+
+    if (debito.status === StatusDebito.PAGO) {
+      throw new ConflictException(`Débito ${id} já está pago`);
+    }
+
+    await this.debitoRepository.atualizar(id, { status: StatusDebito.PAGO });
   }
 
   async resumo(placa: string): Promise<ResumoDebitosQuery> {

@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import {
   ApiBearerAuth,
+  ApiConflictResponse,
   ApiCreatedResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
@@ -77,6 +78,7 @@ export class DebitoController {
   })
   @ApiOkResponse({ description: 'Débito quitado com sucesso' })
   @ApiNotFoundResponse({ description: 'Débito não encontrado' })
+  @ApiConflictResponse({ description: 'Débito já está pago' })
   @Patch(':id/quitar')
   async quitar(@Param('id', ParseIntPipe) id: number): Promise<void> {
     return this.debitoService.quitar(id);

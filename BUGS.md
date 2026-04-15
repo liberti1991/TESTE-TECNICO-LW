@@ -90,6 +90,49 @@
   - `GET /v1/veiculos?proprietario=maria&modelo=civic&anoMin=2020&anoMax=2022` retorna apenas `DEF5678`
   - `GET /v1/veiculos?anoMin=2020&anoMax=2021&limit=1&page=2` mantém `total: 3` e paginação funcionando
 
-### Funcionalidade 2.2 API
+### Funcionalidade 2.2 API - Quitar débito
+
+- localização: `backend-nest/src/debito/aplicacao/service/Debito.service.ts` > (lines: 87-99), `backend-nest/src/debito/aplicacao/controller/Debito.controller.ts` > (lines: 75-83)
+- Reprodução: Autenticação via Swagger, consultar `GET /v1/debitos/veiculo/DEF5678`, Localizar um débito com status `PENDENTE` ou `VENCIDO` e executar `PATCH /v1/debitos/{id}/quitar`. Para validar a regra de conflito, executar a mesma rota com um débito que já esteja `PAGO`.
+- Descrição: o endpoint `PATCH /v1/debitos/:id/quitar` já existia na API, porém não possuía implementação. Com isso, não era possível realizar a quitação de um débito, nem tratar corretamente os cenários de débito inexistente ou já pago.
+- Solução: implementação da regra no service para buscar o débito pelo `id`, retornar `404` quando não encontrado, retornar `409` quando já estiver `PAGO` e atualizar o status para `PAGO` nos casos válidos. Também ajustei a documentação Swagger para refletir o retorno de conflito.
+- Validação:
+  - `GET /v1/debitos/veiculo/DEF5678` permitiu localizar um `IPVA` ainda não pago
+  - `PATCH /v1/debitos/{id}/quitar` atualizou o status desse débito para `PAGO`
+  - nova consulta em `GET /v1/debitos/{id}` confirmou a alteração
+  - tentativa de quitar um débito já `PAGO` retornou `409 Conflict`
+  - tentativa de quitar um débito inexistente retornou `404 Not Found`
+
+### Funcionalidade 2.3 API - Resumo de débitos por placa
+
+- localização:
+- Reprodução:
+- Descrição:
+- Solução:
+- Validação:
+
+### Funcionalidade 2.4 API - Relatório de inadimplência
+
+- localização:
+- Reprodução:
+- Descrição:
+- Solução:
+- Validação:
+
+### Funcionalidade 2.5 FRONT - Paginação na listagem de veículos
+
+- localização:
+- Reprodução:
+- Descrição:
+- Solução:
+- Validação:
+
+### Funcionalidade 2.6 FRONT - Botão quitar débito
+
+- localização:
+- Reprodução:
+- Descrição:
+- Solução:
+- Validação:
 
 ## Melhorias
