@@ -40,7 +40,14 @@
 - Descrição: O cálculo do débito estava incorreto porque os juros eram aplicados sobre o valor com multa, em vez de serem calculados separadamente sobre o valor original. isso fazia o `valorTotal` ficar maior do que o esperado. também havia problema de precisão, retornando números com muitas casas decimais.
 - Solução: Ajustei a regra para calcular `valorMulta` e `valorJuros` sobre o valor base do débito e definir o `valorTotal` como a soma de `valor + valorMulta + valorJuros`. Também apliquei arredondamento monetário para duas casas decimais.
 
-### Bug 6
+### Bug 6 API - StatusCode
+
+- localização: `backend-nest/src/veiculo/aplicacao/controller/Veiculo.controller.ts` > (line: 43)
+- Reprodução: enviar `POST /v1/veiculos` com token válido e payload correto.
+- Descrição: O endpoint `POST/v1/veiculos` estava retornando `200 Ok` por causa do `@HttpCode(200)`, mesmo sendo uma operação de criação. isso deixava a resposta fora do padrão HTTP.
+- Solução: Remoção do `@HttpCode(200)` para o Nest voltar a responder com `201 Created` automaticamente no cadastro de veículo
+  
+### Bug 7
 
 ## Funcionalidades implementadas
 
