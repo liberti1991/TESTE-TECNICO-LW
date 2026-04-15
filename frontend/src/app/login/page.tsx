@@ -2,25 +2,32 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Toast from '@/components/Toast';
+import { useToast } from '@/hooks/useToast';
 import { fazerLogin } from '@/lib/auth';
 
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
-  const [erro, setErro] = useState('');
   const [carregando, setCarregando] = useState(false);
+  const { toast, mostrarToast, fecharToast } = useToast();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
+    fecharToast();
     setCarregando(true);
 
     try {
       await fazerLogin(email, senha);
       router.push('/');
     } catch {
-      setErro('E-mail ou senha inválidos');
+      mostrarToast({
+        tipo: 'erro',
+        titulo: 'Não foi possível entrar',
+        mensagem: 'E-mail ou senha inválidos',
+      });
     } finally {
       setCarregando(false);
     }
@@ -28,6 +35,13 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      {toast && (
+        <Toast
+          tipo={toast.tipo}
+          titulo={toast.titulo}
+          mensagem={toast.mensagem}
+        />
+      )}
       <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-200 w-full max-w-sm">
         <h1 className="text-2xl font-bold text-gray-800 mb-1">Consulta Veicular</h1>
         <p className="text-sm text-gray-500 mb-6">Faça login para continuar</p>
@@ -56,13 +70,6 @@ export default function LoginPage() {
               placeholder="••••••••"
             />
           </div>
-
-          {erro && (
-            <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded px-3 py-2">
-              {erro}
-            </p>
-          )}
-
           <button
             type="submit"
             disabled={carregando}

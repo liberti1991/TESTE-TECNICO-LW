@@ -3,16 +3,13 @@
 import DebitosList from '@/components/DebitosList';
 import Toast from '@/components/Toast';
 import Header from '@/components/Header';
+import { useToast } from '@/hooks/useToast';
 import api, { API_PREFIX, DebitoCalculado, Veiculo } from '@/lib/api';
 import { estaAutenticado } from '@/lib/auth';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-interface Feedback {
-  tipo: 'sucesso' | 'erro';
-  texto: string;
-}
 
 interface ErroApi {
   response?: {
@@ -54,8 +51,8 @@ export default function VeiculoPage() {
   const [debitos, setDebitos] = useState<DebitoCalculado[]>([]);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState('');
-  const [feedback, setFeedback] = useState<Feedback | null>(null);
   const [debitoQuitandoId, setDebitoQuitandoId] = useState<number | null>(null);
+  const { toast, mostrarToast, fecharToast } = useToast();
 
   useEffect(() => {
     if (!estaAutenticado()) {
@@ -82,24 +79,12 @@ export default function VeiculoPage() {
     carregar();
   }, [placa, router]);
 
-  useEffect(() => {
-    if (!feedback) {
-      return;
-    }
-
-    const timeout = window.setTimeout(() => {
-      setFeedback(null);
-    }, 5000);
-
-    return () => window.clearTimeout(timeout);
-  }, [feedback]);
-
   async function quitarDebito(id: number): Promise<void> {
     const debitoSelecionado = debitos.find((debito) => debito.id === id);
     const nomeDebito = montarNomeDebito(debitoSelecionado);
 
     setDebitoQuitandoId(id);
-    setFeedback(null);
+    fecharToast();
 
     try {
       await new Promise((resolve) => window.setTimeout(resolve, 1000)); // Simula atraso para melhor UX
@@ -107,11 +92,16 @@ export default function VeiculoPage() {
       await api.patch(`${API_PREFIX}/debitos/${id}/quitar`);
       const { data } = await api.get<DebitoCalculado[]>(`${API_PREFIX}/debitos/veiculo/${placa}`);
       setDebitos(data);
-      setFeedback({ tipo: 'sucesso', texto: `${nomeDebito} quitado com sucesso.` });
+      mostrarToast({
+        tipo: 'sucesso',
+        titulo: 'Débito atualizado',
+        mensagem: `${nomeDebito} quitado com sucesso.`,
+      });
     } catch (err: unknown) {
-      setFeedback({
+      mostrarToast({
         tipo: 'erro',
-        texto: extrairMensagemErro(err, `Não foi possível quitar ${nomeDebito.toLowerCase()}.`),
+        titulo: 'Não foi possível concluir',
+        mensagem: extrairMensagemErro(err, `Não foi possível quitar ${nomeDebito.toLowerCase()}.`),
       });
     } finally {
       setDebitoQuitandoId(null);
@@ -125,12 +115,11 @@ export default function VeiculoPage() {
     <div className="min-h-screen bg-gray-50">
       <Header />
 
-      {feedback && (
+      {toast && (
         <Toast
-          tipo={feedback.tipo}
-          titulo={feedback.tipo === 'sucesso' ? 'Débito atualizado' : 'Não foi possível concluir'}
-          mensagem={feedback.texto}
-          onClose={() => setFeedback(null)}
+          tipo={toast.tipo}
+          titulo={toast.titulo}
+          mensagem={toast.mensagem}
         />
       )}
 

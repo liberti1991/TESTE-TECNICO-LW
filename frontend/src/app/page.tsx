@@ -2,8 +2,10 @@
 
 import Header from '@/components/Header';
 import Paginacao from '@/components/Paginacao';
+import Toast from '@/components/Toast';
 import VeiculoCard from '@/components/VeiculoCard';
 import { usePaginacao } from '@/hooks/usePaginacao';
+import { useToast } from '@/hooks/useToast';
 import api, { API_PREFIX, RespostaPaginada, Veiculo } from '@/lib/api';
 import { estaAutenticado } from '@/lib/auth';
 import { useRouter } from 'next/navigation';
@@ -15,6 +17,7 @@ export default function HomePage() {
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState('');
   const [busca, setBusca] = useState('');
+  const { toast, mostrarToast, fecharToast } = useToast();
   const {
     paginaAtual,
     limite,
@@ -37,6 +40,7 @@ export default function HomePage() {
   async function carregarVeiculos() {
     setCarregando(true);
     setErro('');
+    fecharToast();
 
     try {
       const { data } = await api.get<RespostaPaginada<Veiculo>>(
@@ -46,6 +50,13 @@ export default function HomePage() {
       setTotalRegistros(data.total);
     } catch {
       setErro('Erro ao carregar veículos. Tente novamente.');
+      setVeiculos([]);
+      setTotalRegistros(0);
+      mostrarToast({
+        tipo: 'erro',
+        titulo: 'Não foi possível carregar',
+        mensagem: 'Erro ao carregar veículos. Tente novamente.',
+      });
     } finally {
       setCarregando(false);
     }
@@ -61,6 +72,14 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
+
+      {toast && (
+        <Toast
+          tipo={toast.tipo}
+          titulo={toast.titulo}
+          mensagem={toast.mensagem}
+        />
+      )}
 
       <main className="mx-auto max-w-5xl px-4 py-8">
         <div className="mb-6 flex items-center justify-between">
@@ -80,12 +99,6 @@ export default function HomePage() {
           />
         </div>
 
-        {erro && (
-          <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-            {erro}
-          </div>
-        )}
-
         {carregando ? (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {Array.from({ length: limite }).map((_, i) => (
@@ -100,20 +113,26 @@ export default function HomePage() {
               ))}
             </div>
 
-            {veiculosFiltrados.length === 0 && !carregando && (
+            {veiculosFiltrados.length === 0 && !erro && (
               <p className="py-10 text-center text-gray-500">Nenhum veículo encontrado.</p>
             )}
 
-            <div className="mt-6 space-y-2">
-              <Paginacao
-                paginaAtual={paginaAtual}
-                totalPaginas={totalPaginas}
-                onMudar={mudarPagina}
-              />
-              <p className="text-center text-xs text-gray-400">
-                Página {paginaAtual} de {totalPaginas}
-              </p>
-            </div>
+            {erro && (
+              <p className="py-10 text-center text-gray-500">Não foi possível carregar os veículos no momento.</p>
+            )}
+
+            {!erro && (
+              <div className="mt-6 space-y-2">
+                <Paginacao
+                  paginaAtual={paginaAtual}
+                  totalPaginas={totalPaginas}
+                  onMudar={mudarPagina}
+                />
+                <p className="text-center text-xs text-gray-400">
+                  Página {paginaAtual} de {totalPaginas}
+                </p>
+              </div>
+            )}
           </>
         )}
       </main>

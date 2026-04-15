@@ -170,15 +170,16 @@
 - Validação:
   - a home passou a consumir o hook sem alterar o comportamento esperado
   
-  ### Melhoria FRONT - Componente reutilizável de toast
+### Melhoria FRONT - Sistema reutilizável de toast
 
-- localização: `frontend/src/components/Toast.tsx`, `frontend/src/app/veiculo/[placa]/page.tsx`
-- Descrição: o feedback visual de sucesso e erro estava implementado diretamente dentro da página de detalhes do veículo, deixando a interface acoplada à tela e dificultando a reutilização do mesmo padrão em outras partes do frontend.
-- Solução: extraí o toast para um componente reutilizável `Toast.tsx`, recebendo `tipo`, `titulo`, `mensagem` e `onClose`. Depois, ajustei a página de detalhes para apenas consumir esse componente, mantendo o mesmo comportamento visual com uma estrutura mais organizada.
+- localização: `frontend/src/components/Toast.tsx`, `frontend/src/hooks/useToast.ts`, `frontend/src/app/veiculo/[placa]/page.tsx`, `frontend/src/app/login/page.tsx`, `frontend/src/app/page.tsx`
+- Descrição: o feedback visual de sucesso e erro estava concentrado em implementações locais, com a lógica de exibição e fechamento automático acoplada às telas. Isso dificultava a reutilização do mesmo padrão visual no restante do frontend.
+- Solução: mantive o `Toast.tsx` como componente visual reutilizável e extraí a lógica de estado e auto-dismiss para o hook `useToast`. Depois apliquei esse mesmo padrão na tela de detalhes do veículo, na home e no login, padronizando o feedback visual entre as telas.
 - Validação:
-  - o toast continua aparecendo corretamente após sucesso ou erro na quitação
-  - a página de detalhes passou a apenas consumir o componente
-  - o frontend compilou normalmente após a extração
+  - a tela de detalhes continua exibindo toast após sucesso ou erro na quitação
+  - a home passou a usar toast para falha ao carregar veículos
+  - o login passou a usar toast para credenciais inválidas
+  - o frontend compilou normalmente após a extração e o reuso
   
   ### Melhoria API - Validação centralizada de placa
 
