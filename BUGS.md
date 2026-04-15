@@ -77,4 +77,19 @@
 
 ## Funcionalidades implementadas
 
+### Funcionalidade 2.1 API - Filtro avançado de veículos
+
+- localização: `backend-nest/src/veiculo/infra/repository/Veiculo.repository.ts` > (lines: 13-45)
+- Reprodução: Fazer a autenticação no Swagger e realizar p `GET /v1/veiculos` usando os filtros `proprietario`, `modelo`, `anoMin` e `anoMax`, isolados ou combinados.
+- Descrição: a API já aceitava os query params `proprietario`, `modelo`, `anoMin` e `anoMax`, porém não existia a implementação desses filtros avançados, sendo assim a listagem sempre retornava todos os veículos.
+- Solução: implementando os filtros diretamente no `QueryBuilder` do TypeORM, aplicado a busca parcial e case-insensitive para `proprietario` e `modelo`, além de intervalo numérico para `anoMin` e `anoMax`. Também mantive a paginação correta com `query.clone()`, separando a consulta dos dados da consulta de contagem total.
+- Validação:
+  - `GET /v1/veiculos?proprietario=silva` retorna apenas `ABC1234`
+  - `GET /v1/veiculos?modelo=civic` retorna apenas `DEF5678`
+  - `GET /v1/veiculos?anoMin=2020&anoMax=2021` retorna 3 veículos
+  - `GET /v1/veiculos?proprietario=maria&modelo=civic&anoMin=2020&anoMax=2022` retorna apenas `DEF5678`
+  - `GET /v1/veiculos?anoMin=2020&anoMax=2021&limit=1&page=2` mantém `total: 3` e paginação funcionando
+
+### Funcionalidade 2.2 API
+
 ## Melhorias
