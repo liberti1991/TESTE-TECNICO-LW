@@ -54,7 +54,14 @@
 - Descrição: Os filtros por `status` e `tipo` não estavam sendo aplicados na consulta dos débitos. O filtro por `tipo` estava comentado e o filtro por `status` nem existia, assim a API sempre retornava a lista completa.
 - Solução: Implementai os `andWhere` para `status` e `tipo` na query do repositório, fazendo com que os parâmetros enviados na rota passem a afetar corretamente o resultado.
 
-### Bug 8
+### Bug 8 FRONT - Interceptor global
+
+- localização: `frontend/src/lib/api.ts` > (lines: 18-31)
+- Reprodução: abrir a tela de login e tentar autenticar com credenciais inválidas.
+- Descrição: O interceptor global travava qualquer `410 Unauthorized` redirecionando o usuário para `/login`, inclusive quado o erro vinha da própria rota de login. isso atrapalha o fluxo de autenticação e poderia esconder o feedback correto de credenciais inválidas.
+- Solução: Ajustando o interceptor para manter o redirecionamento apenas para rotas protegidas e ignorar esse comportamento quando o 401 vier da rota de login. Assim o formulário consegue exibir o erro corretamente ao usuário.
+  
+### Bug 9
 
 ## Funcionalidades implementadas
 

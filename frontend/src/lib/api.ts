@@ -18,7 +18,11 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    const status = error.response?.status;
+    const requestUrl = error.config?.url as string | undefined;
+    const isLoginRequest = requestUrl?.includes(`${API_PREFIX}/auth/login`);
+
+    if (status === 401 && !isLoginRequest) {
       Cookies.remove('token');
       if (typeof window !== 'undefined') {
         window.location.href = '/login';
