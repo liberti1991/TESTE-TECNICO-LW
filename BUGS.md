@@ -68,7 +68,12 @@
 - Descrição: Ao abrir a tela de detalhes do veículo, algumas datas de vencimento apareciam com um dia a menos. isso acontecia porque a data recebida da API era convertida diretamente com `new Date`, sofrendo impacto do fuso do navegador.
 - Solução: Ajustando a função de formato para montar a data manualmente a partir da string recebida, garantindo que o vencimento exibido seja o mesmo informado pela API.
   
-### Bug 10
+### Bug 10 FRONT - Tipagem ajustada no card de veiculo
+
+- localização: `frontend/src/components/VeiculoCard.tsx` > (lines: 15-24)
+- Reprodução: abrir a home, inspecionar a chamada `/v1/debitos/veiculo/:placa` no DevTools e comparar o retorno real com o tipo usado no componente.
+- Descrição: O componente `VeiculoCard` consumia a rota `/debitos/veiculo/:placa` como se a resposta fosse paginada, utilizando `RespostaPaginada<DebitoCalculado>`, Porém, a API retorna um array simples de débitos. código só funcionava porque fazia um cast forçado, mascarando a inconsistência entre o front e o back.
+- Solução: Ajustando a chamada da API para o tipo correto ( DebitoCalculado[]) e removi o cast manual, deixando a contagem de débitos alinhada com o retorno real da rota.
 
 ## Funcionalidades implementadas
 

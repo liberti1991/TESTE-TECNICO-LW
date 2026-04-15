@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Veiculo, DebitoCalculado, RespostaPaginada } from '@/lib/api';
+import { Veiculo, DebitoCalculado } from '@/lib/api';
 import api, { API_PREFIX } from '@/lib/api';
 
 interface Props {
@@ -16,9 +16,9 @@ export default function VeiculoCard({ veiculo }: Props) {
   useEffect(() => {
     setCarregando(true);
     api
-      .get<RespostaPaginada<DebitoCalculado>>(`${API_PREFIX}/debitos/veiculo/${veiculo.placa}`)
+      .get<DebitoCalculado[]>(`${API_PREFIX}/debitos/veiculo/${veiculo.placa}`)
       .then(({ data }) => {
-        const pendentes = (data as unknown as DebitoCalculado[]).filter(
+        const pendentes = data.filter(
           (d) => d.status === 'PENDENTE' || d.status === 'VENCIDO'
         );
         setTotalDebitos(pendentes.length);
