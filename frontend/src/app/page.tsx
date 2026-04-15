@@ -1,11 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import api, { API_PREFIX, Veiculo, RespostaPaginada } from '@/lib/api';
-import { estaAutenticado } from '@/lib/auth';
 import Header from '@/components/Header';
 import VeiculoCard from '@/components/VeiculoCard';
+import api, { API_PREFIX, RespostaPaginada, Veiculo } from '@/lib/api';
+import { estaAutenticado } from '@/lib/auth';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 export default function HomePage() {
   const router = useRouter();
@@ -19,7 +19,7 @@ export default function HomePage() {
   // mas o frontend ignora `total` e não oferece navegação entre páginas.
   const [paginaAtual] = useState(1);
   const [totalRegistros, setTotalRegistros] = useState(0);
-  const LIMITE = 5;
+  const LIMITE = 4;
 
   useEffect(() => {
     if (!estaAutenticado()) {

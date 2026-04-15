@@ -117,11 +117,15 @@
 
 ### Funcionalidade 2.4 API - Relatório de inadimplência
 
-- localização:
-- Reprodução:
-- Descrição:
-- Solução:
+- localização: `backend-nest/src/relatorio/aplicacao/service/Relatorio.service.ts` > (lines: 18-77), `backend-nest/src/relatorio/aplicacao/controller/Relatorio.controller.ts` > (lines: 14-21)
+- Reprodução: autenticar no Swagger e executar `GET /v1/relatorios/inadimplencia`.
+- Descrição: o endpoint de relatório ja existente, porém não possuía implementação no service.
+- Solução: implementação a busca dos débitos com status `VENCIDO`, carregando os dados do veículo relacionado, agrupando os resultados por veículo, calculando o valor total vencido com multa e juros, ordenando pelo maior valor e retornando também os totalizadores gerais do relatório.
 - Validação:
+  - o endpoint retorna apenas veículos com débitos `VENCIDO`
+  - cada item retorna `placa`, `proprietario`, `modelo`, `totalDebitosVencidos` e `valorTotalVencido`
+  - a lista vem ordenada por `valorTotalVencido` decrescente
+  - o retorno inclui `totalVeiculos` e `valorTotalGeral`
 
 ### Funcionalidade 2.5 FRONT - Paginação na listagem de veículos
 
@@ -145,3 +149,12 @@
   - o feedback de sucesso ou erro aparece em formato de toast na tela
 
 ## Melhorias
+
+### Melhoria - Util compartilhado para arredondamento monetário
+
+- localização: `backend-nest/src/common/utils/moeda.util.ts`, `backend-nest/src/debito/aplicacao/service/Debito.service.ts`, `backend-nest/src/relatorio/aplicacao/service/Relatorio.service.ts`
+- Descrição: Regra de arredondamento duplicada em mais de um service, risco de inconsistência futura caso a forma de cálculo precisasse ser alterada.
+- Solução: Criação de um util compartilhado `arredondarMoeda`, passei a utilizar services de débitos e relatórios, centralizando a regra de arredondamento em um único local.
+- Validação:
+  - os cálculos continuaram retornando valores com duas casas decimais
+  - os services passaram a consumir a mesma função utilitária

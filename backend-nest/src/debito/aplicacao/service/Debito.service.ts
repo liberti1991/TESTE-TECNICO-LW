@@ -6,6 +6,7 @@ import { StatusDebito } from 'src/debito/dominio/enuns/StatusDebito.enum';
 import { DebitoCalculadoQuery } from 'src/debito/dominio/query/DebitoCalculado.query';
 import { ResumoDebitosQuery } from 'src/debito/dominio/query/ResumoDebitos.query';
 import { DebitoRepository } from 'src/debito/infra/repository/Debito.repository';
+import { arredondarMoeda } from 'src/common/utils/moeda.util';
 import { VeiculoRepository } from 'src/veiculo/infra/repository/Veiculo.repository';
 
 @Injectable()
@@ -15,15 +16,11 @@ export class DebitoService {
     private readonly veiculoRepository: VeiculoRepository,
   ) {}
 
-  private arredondarMoeda(valor: number): number {
-    return Number(valor.toFixed(2));
-  }
-
   calcularTotais(debito: Debito): DebitoCalculadoQuery {
-    const valorBase = this.arredondarMoeda(debito.valor);
-    const valorMulta = this.arredondarMoeda(valorBase * (debito.percentualMulta / 100));
-    const valorJuros = this.arredondarMoeda(valorBase * (debito.percentualJuros / 100));
-    const valorTotal = this.arredondarMoeda(valorBase + valorMulta + valorJuros);
+    const valorBase = arredondarMoeda(debito.valor);
+    const valorMulta = arredondarMoeda(valorBase * (debito.percentualMulta / 100));
+    const valorJuros = arredondarMoeda(valorBase * (debito.percentualJuros / 100));
+    const valorTotal = arredondarMoeda(valorBase + valorMulta + valorJuros);
 
     return {
       ...debito,
@@ -110,11 +107,11 @@ export class DebitoService {
 
     const porTipo = debitosCalculados.reduce<Record<string, number>>((acumulado, debito) => {
       const valorAtual = acumulado[debito.tipo] ?? 0;
-      acumulado[debito.tipo] = this.arredondarMoeda(valorAtual + debito.valorTotal);
+      acumulado[debito.tipo] = arredondarMoeda(valorAtual + debito.valorTotal);
       return acumulado;
     }, {});
 
-    const valorTotal = this.arredondarMoeda(
+    const valorTotal = arredondarMoeda(
       debitosCalculados.reduce((total, debito) => total + debito.valorTotal, 0),
     );
 

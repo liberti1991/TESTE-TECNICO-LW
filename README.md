@@ -189,6 +189,7 @@ Sugestões (não obrigatórias):
 - Tratamento de erro global no NestJS (exception filter)
 - Validação de placa centralizada no backend-nest
 - Feedback visual no frontend quando a API retorna erro
+- utils/moeda.ts
 
 ---
 
