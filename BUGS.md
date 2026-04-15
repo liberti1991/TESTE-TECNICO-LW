@@ -170,3 +170,13 @@
 - Validação:
   - a home passou a consumir o hook sem alterar o comportamento esperado
   
+  ### Melhoria FRONT - Componente reutilizável de toast
+
+- localização: `frontend/src/components/Toast.tsx`, `frontend/src/app/veiculo/[placa]/page.tsx`
+- Descrição: o feedback visual de sucesso e erro estava implementado diretamente dentro da página de detalhes do veículo, deixando a interface acoplada à tela e dificultando a reutilização do mesmo padrão em outras partes do frontend.
+- Solução: extraí o toast para um componente reutilizável `Toast.tsx`, recebendo `tipo`, `titulo`, `mensagem` e `onClose`. Depois, ajustei a página de detalhes para apenas consumir esse componente, mantendo o mesmo comportamento visual com uma estrutura mais organizada.
+- Validação:
+  - o toast continua aparecendo corretamente após sucesso ou erro na quitação
+  - a página de detalhes passou a apenas consumir o componente
+  - o frontend compilou normalmente após a extração
+  
