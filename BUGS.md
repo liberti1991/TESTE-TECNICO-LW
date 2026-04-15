@@ -25,6 +25,16 @@
 - Descrição: O método `listarPorPlaca`, estava realizando a busca sem o `await`, então o código tentava usar o resultado assíncrono antes da resolução. Com isso, o filtro por veículo não era aplicado corretamente e o endpoint de débitos por placa retornava dados incorretos.
 - Solução: Ao adicionar o `await` na busca passamos a enviar o veiculo.id correto para o repositório, garantindo que a listagem retorno apenas os débitos do veículo consultado.
 
+### Bug 4 FRONT - Nomenclatura em divergência front e back
+
+- localização: `frontend/src/components/DebitosList.tsx` > (line: 66, 68, 70, 73, 75), `frontend/src/app/veiculo/[placa]/page.tsx > (line: 47 ),
+`frontend/src/lib/api.ts` > (lines: 42, 47, 51-55, 58 )
+- Reprodução: acessar `http://localhost:3000/veiculo/ABC1234`.
+- Descrição: O Frontend estava esperando os dados dos débitos no formato `snake_case`, campos como `valor_total`, `Valor_multa` e `valor_juros`. Porém o backend retornava esses dados em `camelCase` como `valorTotal`, `ValorMulta` e `ValorJuros`. isso fazia os valores chegarem como undefined no component causando o erro `Cannot read properties of undefined (reading 'toLocaleString')` ao abrir os detalhes do veículo.
+- Solução: Ajustando os tipos e o consumo dos dados no frontend para seguir o mesmo padrão do backend, trocando os campos em `snake_case` para `camelCase`. assim passa a ser lidos corretamente e a tela voltou a funcionar sem crachá.
+
+### Bug 5
+
 ## Funcionalidades implementadas
 
 ## Melhorias

@@ -63,16 +63,16 @@ export default function DebitosList({ debitos }: Props) {
             </div>
             <div className="text-right ml-4">
               <p className="text-base font-bold text-gray-900">
-                {formatarMoeda(debito.valor_total)}
+                {formatarMoeda(debito.valorTotal)}
               </p>
-              {debito.valor_multa > 0 && (
+              {debito.valorMulta > 0 && (
                 <p className="text-xs text-red-500">
-                  + {formatarMoeda(debito.valor_multa)} multa
+                  + {formatarMoeda(debito.valorMulta)} multa
                 </p>
               )}
-              {debito.valor_juros > 0 && (
+              {debito.valorJuros > 0 && (
                 <p className="text-xs text-orange-500">
-                  + {formatarMoeda(debito.valor_juros)} juros
+                  + {formatarMoeda(debito.valorJuros)} juros
                 </p>
               )}
             </div>

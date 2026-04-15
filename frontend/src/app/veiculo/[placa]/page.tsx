@@ -44,7 +44,7 @@ export default function VeiculoPage() {
   }, [placa, router]);
 
   const debitosPendentes = debitos.filter((d) => d.status !== 'PAGO');
-  const valorTotal = debitosPendentes.reduce((acc, d) => acc + d.valor_total, 0);
+  const valorTotal = debitosPendentes.reduce((acc, d) => acc + d.valorTotal, 0);
 
   return (
     <div className="min-h-screen bg-gray-50">
