@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, Param, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiConflictResponse,
@@ -40,7 +40,6 @@ export class VeiculoController {
   @ApiOperation({ summary: 'Cadastrar novo veículo' })
   @ApiCreatedResponse({ type: Veiculo })
   @ApiConflictResponse({ description: 'Placa já cadastrada' })
-  @HttpCode(200)
   @Post()
   async criar(@Body() dto: CriarVeiculoDto): Promise<Veiculo> {
     return this.veiculoService.criar(dto);
