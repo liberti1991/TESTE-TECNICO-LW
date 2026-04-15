@@ -7,6 +7,7 @@ import { DebitoCalculadoQuery } from 'src/debito/dominio/query/DebitoCalculado.q
 import { ResumoDebitosQuery } from 'src/debito/dominio/query/ResumoDebitos.query';
 import { DebitoRepository } from 'src/debito/infra/repository/Debito.repository';
 import { arredondarMoeda } from 'src/common/utils/moeda.util';
+import { calcularDebito } from 'src/common/utils/calcularDebito.util';
 import { VeiculoRepository } from 'src/veiculo/infra/repository/Veiculo.repository';
 
 @Injectable()
@@ -17,10 +18,11 @@ export class DebitoService {
   ) {}
 
   calcularTotais(debito: Debito): DebitoCalculadoQuery {
-    const valorBase = arredondarMoeda(debito.valor);
-    const valorMulta = arredondarMoeda(valorBase * (debito.percentualMulta / 100));
-    const valorJuros = arredondarMoeda(valorBase * (debito.percentualJuros / 100));
-    const valorTotal = arredondarMoeda(valorBase + valorMulta + valorJuros);
+    const { valorBase, valorMulta, valorJuros, valorTotal } = calcularDebito({
+      valor: debito.valor,
+      percentualMulta: debito.percentualMulta,
+      percentualJuros: debito.percentualJuros,
+    });
 
     return {
       ...debito,

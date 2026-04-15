@@ -152,14 +152,15 @@
 
 ## Melhorias
 
-### Melhoria API - Util compartilhado para arredondamento monetário
+### Melhoria API - Util compartilhado para cálculo e arredondamento monetário
 
-- localização: `backend-nest/src/common/utils/moeda.util.ts`, `backend-nest/src/debito/aplicacao/service/Debito.service.ts`, `backend-nest/src/relatorio/aplicacao/service/Relatorio.service.ts`
-- Descrição: Regra de arredondamento duplicada em mais de um service, risco de inconsistência futura caso a forma de cálculo precisasse ser alterada.
-- Solução: Criação de um util compartilhado `arredondarMoeda`, passei a utilizar services de débitos e relatórios, centralizando a regra de arredondamento em um único local.
+- localização: `backend-nest/src/common/utils/calcularDebito.util.ts`, `backend-nest/src/common/utils/moeda.util.ts`, `backend-nest/src/debito/aplicacao/service/Debito.service.ts`, `backend-nest/src/relatorio/aplicacao/service/Relatorio.service.ts`
+- Descrição: a regra de cálculo monetário dos débitos estava distribuída em mais de um service do backend. Isso aumentava o risco de inconsistência futura sempre que a fórmula de cálculo ou a regra de arredondamento precisassem ser alteradas.
+- Solução: centralizei o cálculo em `calcularDebito.util.ts`, responsável por retornar `valorBase`, `valorMulta`, `valorJuros` e `valorTotal`, e mantive `moeda.util.ts` apenas com a responsabilidade de arredondamento. Assim, os services de débitos e relatórios passaram a reutilizar a mesma regra de cálculo.
 - Validação:
-  - os cálculos continuaram retornando valores com duas casas decimais
-  - os services passaram a consumir a mesma função utilitária
+  - os valores calculados continuaram retornando `valorBase`, `valorMulta`, `valorJuros` e `valorTotal` corretamente
+  - os services de débitos e relatórios passaram a consumir a mesma regra de cálculo
+  - futuras alterações na fórmula ou no arredondamento agora podem ser feitas em um único ponto
 
 ### Melhoria FRONT - Hook reutilizável de paginação
 

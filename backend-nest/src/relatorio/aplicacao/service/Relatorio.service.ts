@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Debito } from 'src/debito/dominio/entity/Debito.entity';
+import { calcularDebito } from 'src/common/utils/calcularDebito.util';
 import { arredondarMoeda } from 'src/common/utils/moeda.util';
 import { StatusDebito } from 'src/debito/dominio/enuns/StatusDebito.enum';
 import {
@@ -17,11 +18,13 @@ export class RelatorioService {
   ) {}
 
   private calcularValorTotalVencido(debito: Debito): number {
-    const valorBase = arredondarMoeda(debito.valor);
-    const valorMulta = arredondarMoeda(valorBase * (debito.percentualMulta / 100));
-    const valorJuros = arredondarMoeda(valorBase * (debito.percentualJuros / 100));
+    const { valorTotal } = calcularDebito({
+      valor: debito.valor,
+      percentualMulta: debito.percentualMulta,
+      percentualJuros: debito.percentualJuros,
+    });
 
-    return arredondarMoeda(valorBase + valorMulta + valorJuros);
+    return valorTotal;
   }
 
   async inadimplencia(): Promise<RelatorioInadimplenciaQuery> {
