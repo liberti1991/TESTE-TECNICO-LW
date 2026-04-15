@@ -105,11 +105,15 @@
 
 ### Funcionalidade 2.3 API - Resumo de débitos por placa
 
-- localização:
-- Reprodução:
-- Descrição:
-- Solução:
+- localização: `backend-nest/src/debito/aplicacao/service/Debito.service.ts` > (lines: 101-128), `backend-nest/src/debito/aplicacao/controller/Debito.controller.ts` > (lines: 41-46)
+- Reprodução: autenticar no Swagger e executar `GET /v1/debitos/resumo?placa=ABC1234`.
+- Descrição: o endpoint de resumo por placa já existia no controller, porém não possuía implementação no service.
+- Solução: Implantação de busca por placa, a listagem dos débitos vinculados, o cálculo dos valores com multa e juros, a soma do valor total e o agrupamento por tipo de débito. Também mantive o retorno `404` quando a placa informada não existir.
 - Validação:
+  - o endpoint retorna `placa`, `proprietario`, `totalDebitos`, `valorTotal` e `porTipo`
+  - `valorTotal` usa os valores calculados, não o valor bruto
+  - `porTipo` retorna a soma dos débitos agrupados por tipo
+  - ao informar uma placa inexistente, a API retorna `404 Not Found`
 
 ### Funcionalidade 2.4 API - Relatório de inadimplência
 

@@ -1,12 +1,12 @@
-import { ConflictException, Injectable, NotImplementedException, NotFoundException } from '@nestjs/common';
-import { DebitoRepository } from 'src/debito/infra/repository/Debito.repository';
-import { VeiculoRepository } from 'src/veiculo/infra/repository/Veiculo.repository';
-import { Debito } from 'src/debito/dominio/entity/Debito.entity';
-import { CriarDebitoDto } from 'src/debito/dominio/dto/CriarDebito.dto';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { FiltrarDebitosCommand } from 'src/debito/dominio/command/FiltrarDebitos.command';
+import { CriarDebitoDto } from 'src/debito/dominio/dto/CriarDebito.dto';
+import { Debito } from 'src/debito/dominio/entity/Debito.entity';
+import { StatusDebito } from 'src/debito/dominio/enuns/StatusDebito.enum';
 import { DebitoCalculadoQuery } from 'src/debito/dominio/query/DebitoCalculado.query';
 import { ResumoDebitosQuery } from 'src/debito/dominio/query/ResumoDebitos.query';
-import { StatusDebito } from 'src/debito/dominio/enuns/StatusDebito.enum';
+import { DebitoRepository } from 'src/debito/infra/repository/Debito.repository';
+import { VeiculoRepository } from 'src/veiculo/infra/repository/Veiculo.repository';
 
 @Injectable()
 export class DebitoService {
@@ -99,6 +99,31 @@ export class DebitoService {
   }
 
   async resumo(placa: string): Promise<ResumoDebitosQuery> {
-    throw new NotImplementedException('Funcionalidade não implementada');
+    const veiculo = await this.veiculoRepository.buscarPorPlaca(placa.toUpperCase());
+
+    if (!veiculo) {
+      throw new NotFoundException(`Veículo com placa ${placa} não encontrado`);
+    }
+
+    const debitos = await this.debitoRepository.buscarPorVeiculoId(veiculo.id as number);
+    const debitosCalculados = debitos.map((debito) => this.calcularTotais(debito));
+
+    const porTipo = debitosCalculados.reduce<Record<string, number>>((acumulado, debito) => {
+      const valorAtual = acumulado[debito.tipo] ?? 0;
+      acumulado[debito.tipo] = this.arredondarMoeda(valorAtual + debito.valorTotal);
+      return acumulado;
+    }, {});
+
+    const valorTotal = this.arredondarMoeda(
+      debitosCalculados.reduce((total, debito) => total + debito.valorTotal, 0),
+    );
+
+    return {
+      placa: veiculo.placa,
+      proprietario: veiculo.proprietario,
+      totalDebitos: debitosCalculados.length,
+      valorTotal,
+      porTipo,
+    };
   }
 }
